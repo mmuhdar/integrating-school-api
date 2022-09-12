@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  role String?
+  status String?
+  siswa Siswa?
+  guru Guru?
+}
+
+model Kelas {
+  id String @id @default(uuid())
+  nama String
+  wali Guru?
+  siswa Siswa[]
+}
+
+model Siswa {
+  id String @id @default(uuid())
+  nama String
+  alamat String
+  kelasId String?
+  userId String? @unique
+  kelas Kelas? @relation(fields: [kelasId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model Mapel {
+  id String @id @default(uuid())
+  nama String
+  guru Guru[]
+}
+
+model Guru {
+  id String @id @default(uuid())
+  nama String
+  mapelId String?
+  kelasId String? @unique
+  userId String @unique
+  mapel Mapel? @relation(fields: [mapelId], references: [id])
+  kelas Kelas? @relation(fields: [kelasId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+  jadwal Jadwal[]
+}
+
+model Jadwal {
+  id String @id @default(uuid())
+  hari String
+  guruId String?
+  guru Guru? @relation(fields: [guruId], references: [id])
+}
